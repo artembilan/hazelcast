@@ -371,7 +371,7 @@ public class PartitionManager {
             indexesOfDead[partition.getPartitionId()] = partition.getReplicaIndexOf(deadAddress);
         }
         if (!deadMember.isLiteMember()) {
-            clearTaskQueues();
+//            clearTaskQueues();
             // shift partition table up.
             for (PartitionInfo partition : partitions) {
                 // safe removal of dead address from partition table.
