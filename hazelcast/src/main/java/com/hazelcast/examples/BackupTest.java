@@ -16,6 +16,7 @@ public class BackupTest {
 
     static final int NODES;
     static final int SIZE;
+    static final int ENTRIES;
 
     static {
         int n = 20;
@@ -33,6 +34,14 @@ public class BackupTest {
             e.printStackTrace();
         }
         SIZE = s;
+
+        int en = 1000000;
+        try {
+            en = Integer.parseInt(System.getProperty("entry.count"));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        ENTRIES = en;
     }
 
     public static void main(String[] args) throws Exception {
@@ -59,13 +68,12 @@ public class BackupTest {
         final int nThreads = 100;
         final String uuid = localMember.getUuid();
         ExecutorService ex = Executors.newFixedThreadPool(nThreads);
-        final int entries = 10000000;
         final CountDownLatch latch = new CountDownLatch(nThreads);
         for (int i = 0; i < nThreads; i++) {
             final int finalI = i;
             ex.execute(new Runnable() {
                 public void run() {
-                    final int total = entries / nThreads / NODES;
+                    final int total = ENTRIES / nThreads / NODES;
                     for (int j = 0; j < total; j++) {
                         map.put(uuid + finalI + "-" + j, new byte[SIZE]);
                     }
