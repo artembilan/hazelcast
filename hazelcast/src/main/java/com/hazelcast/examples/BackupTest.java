@@ -17,7 +17,7 @@ public class BackupTest {
     static final int SIZE;
 
     static {
-        int s = 1024;
+        int s = 2048;
         try {
              s = Integer.parseInt(System.getProperty("entry.size"));
         } catch (NumberFormatException e) {
@@ -48,6 +48,7 @@ public class BackupTest {
         }.start();
 
         final int nThreads = 100;
+        final String uuid = localMember.getUuid();
         ExecutorService ex = Executors.newFixedThreadPool(nThreads);
         final int entries = 10000000;
         final CountDownLatch latch = new CountDownLatch(nThreads);
@@ -55,9 +56,9 @@ public class BackupTest {
             final int finalI = i;
             ex.execute(new Runnable() {
                 public void run() {
-                    final int total = entries / nThreads;
+                    final int total = entries / nThreads / 20;
                     for (int j = 0; j < total; j++) {
-                        map.put(finalI + "-" + j, new byte[SIZE]);
+                        map.put(uuid + finalI + "-" + j, new byte[SIZE]);
                     }
                     latch.countDown();
                 }
