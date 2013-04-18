@@ -27,10 +27,6 @@ public class BackupTest {
     public static void main(String[] args) throws Exception {
         final Config config = new XmlConfigBuilder().build();
         final HazelcastInstance hz = Hazelcast.newHazelcastInstance(config);
-        Hazelcast.newHazelcastInstance(config);
-        Hazelcast.newHazelcastInstance(config);
-        Hazelcast.newHazelcastInstance(config);
-        Hazelcast.newHazelcastInstance(config);
 
         if (hz.getCluster().getMembers().iterator().next().localMember()) {
             final int nThreads = 100;
