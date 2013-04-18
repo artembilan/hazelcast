@@ -1,10 +1,12 @@
 package com.hazelcast.examples;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.PartitionGroupConfig;
 import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import com.hazelcast.core.Member;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -26,13 +28,16 @@ public class BackupTest {
 
     public static void main(String[] args) throws Exception {
         final Config config = new XmlConfigBuilder().build();
+        config.getPartitionGroupConfig().setEnabled(true).setGroupType(PartitionGroupConfig.MemberGroupType.HOST_AWARE);
+
         final HazelcastInstance hz = Hazelcast.newHazelcastInstance(config);
         final IMap<Object,Object> map = hz.getMap("test");
+        final Member localMember = hz.getCluster().getLocalMember();
 
         new Thread() {
             public void run() {
                 while (true) {
-                    System.out.println(hz.getCluster().getLocalMember() + " -> SIZE: " + map.size());
+                    System.out.println(localMember + " -> SIZE: " + map.size());
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException e) {
@@ -42,24 +47,24 @@ public class BackupTest {
             }
         }.start();
 
-        if (hz.getCluster().getMembers().iterator().next().localMember()) {
-            final int nThreads = 100;
-            ExecutorService ex = Executors.newFixedThreadPool(nThreads);
-            final int entries = 10000000;
-            final CountDownLatch latch = new CountDownLatch(nThreads);
-            for (int i = 0; i < nThreads; i++) {
-                final int finalI = i;
-                ex.execute(new Runnable() {
-                    public void run() {
-                        for (int j = 0; j < entries / nThreads; j++) {
-                            map.put(finalI + "k-" + j, new byte[SIZE]);
-                        }
-                        latch.countDown();
+        final int nThreads = 100;
+        ExecutorService ex = Executors.newFixedThreadPool(nThreads);
+        final int entries = 10000000;
+        final CountDownLatch latch = new CountDownLatch(nThreads);
+        for (int i = 0; i < nThreads; i++) {
+            final int finalI = i;
+            ex.execute(new Runnable() {
+                public void run() {
+                    final int total = entries / nThreads;
+                    for (int j = 0; j < total; j++) {
+                        map.put(finalI + "-" + j, new byte[SIZE]);
                     }
-                });
-            }
-            latch.await();
-            ex.shutdown();
+                    latch.countDown();
+                }
+            });
         }
+        latch.await();
+        ex.shutdown();
+        System.err.println(localMember + " -> DONE");
     }
 }
