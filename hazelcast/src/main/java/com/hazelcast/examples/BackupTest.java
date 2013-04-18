@@ -7,6 +7,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
+import com.hazelcast.monitor.LocalMapStats;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -37,7 +38,9 @@ public class BackupTest {
         new Thread() {
             public void run() {
                 while (true) {
-                    System.out.println(localMember + " -> SIZE: " + map.size());
+                    final LocalMapStats st = map.getLocalMapStats();
+                    System.out.println(localMember + " -> SIZE: " + map.size()
+                            + ", Owned: " + st.getOwnedEntryCount() + ", Backup: " + st.getBackupEntryCount());
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException e) {
