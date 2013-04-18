@@ -34,7 +34,7 @@ public class BackupTest {
                 while (true) {
                     System.out.println(hz.getCluster().getLocalMember() + " -> SIZE: " + map.size());
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(10000);
                     } catch (InterruptedException e) {
                         return;
                     }
@@ -59,6 +59,7 @@ public class BackupTest {
                 });
             }
             latch.await();
+            ex.shutdown();
         }
     }
 }
