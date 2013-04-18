@@ -28,7 +28,7 @@ public class BackupTest {
 
         int s = 2048;
         try {
-            s = Integer.parseInt(System.getProperty("entry.count"));
+            s = Integer.parseInt(System.getProperty("entry.size"));
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
