@@ -27,11 +27,24 @@ public class BackupTest {
     public static void main(String[] args) throws Exception {
         final Config config = new XmlConfigBuilder().build();
         final HazelcastInstance hz = Hazelcast.newHazelcastInstance(config);
+        final IMap<Object,Object> map = hz.getMap("test");
+
+        new Thread() {
+            public void run() {
+                while (true) {
+                    System.out.println(hz.getCluster().getLocalMember() + " -> SIZE: " + map.size());
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+            }
+        }.start();
 
         if (hz.getCluster().getMembers().iterator().next().localMember()) {
             final int nThreads = 100;
             ExecutorService ex = Executors.newFixedThreadPool(nThreads);
-            final IMap<Object,Object> map = hz.getMap("test");
             final int entries = 10000000;
             final CountDownLatch latch = new CountDownLatch(nThreads);
             for (int i = 0; i < nThreads; i++) {
