@@ -717,10 +717,10 @@ public class PartitionManager {
     private class SendClusterStateTask implements Runnable {
         public void run() {
             if (concurrentMapManager.isMaster() && concurrentMapManager.node.isActive()) {
-                if ((!scheduledTasksQueue.isEmpty() || !immediateTasksQueue.isEmpty()) && migrationActive.get()) {
+//                if ((!scheduledTasksQueue.isEmpty() || !immediateTasksQueue.isEmpty()) && migrationActive.get()) {
                     logger.log(Level.INFO, "Remaining migration tasks in queue => Immediate-Tasks: " + immediateTasksQueue.size()
                             + ", Scheduled-Tasks: " + scheduledTasksQueue.size());
-                }
+//                }
                 final Node node = concurrentMapManager.node;
                 concurrentMapManager.enqueueAndReturn(new Processable() {
                     public void process() {
